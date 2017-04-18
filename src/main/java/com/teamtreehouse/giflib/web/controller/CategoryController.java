@@ -3,6 +3,7 @@ package com.teamtreehouse.giflib.web.controller;
 import com.teamtreehouse.giflib.model.Category;
 import com.teamtreehouse.giflib.service.CategoryService;
 import com.teamtreehouse.giflib.web.Color;
+import com.teamtreehouse.giflib.web.FlashMessage;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -53,7 +55,10 @@ public class CategoryController {
     @RequestMapping("categories/add")
     public String formNewCategory(Model model) {
         // TODO: Add model attributes needed for new form
-        model.addAttribute("category", new Category());
+        if(!model.containsAttribute("category")) {
+            model.addAttribute("category", new Category());
+        }
+
         model.addAttribute("colors", Color.values());
         return "category/form";
     }
@@ -77,11 +82,23 @@ public class CategoryController {
 
     // Add a category
     @RequestMapping(value = "/categories", method = RequestMethod.POST)
-    public String addCategory(@Valid Category category, BindingResult result) {
+    public String addCategory(@Valid Category category, BindingResult result, RedirectAttributes redirectAttributes) {
         // TODO: Add category if valid data was received
-        if (result.hasErrors()) return "redirect: categories/add";
+        if (result.hasErrors()) {
+            //Include validation errors upon redirect
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.category",result);
+
+            // Add category is invalid was received
+            redirectAttributes.addFlashAttribute("category", category);
+
+            // Redirect back to form
+            return "redirect: categories/add";
+        }
 
         categoryService.save(category);
+
+        //If save was successful
+        redirectAttributes.addFlashAttribute("flash", new FlashMessage("Category was successfully added!", FlashMessage.Status.SUCCESS));
 
         // TODO: Redirect browser to /categories
         return "redirect:/categories";

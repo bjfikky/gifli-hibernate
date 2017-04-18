@@ -14,10 +14,10 @@ public class Category {
     private Long id;
 
     @NotNull
-    @Size(min = 3, max = 14)
+    @Size(min = 3, max = 14, message = "Categories must be between {min} and {max} characters in length.")
     private String name;
 
-    @NotNull
+    @NotNull(message = "Your must select a color.")
     @Pattern(regexp = "#[0-9a-fA-F]{6}")
     private String colorCode;
 

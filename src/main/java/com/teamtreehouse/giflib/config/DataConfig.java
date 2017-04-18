@@ -25,7 +25,9 @@ public class DataConfig {
     public LocalSessionFactoryBean sessionFactory() {
         Resource config = new ClassPathResource("hibernate.cfg.xml");
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
+
         sessionFactoryBean.setConfigLocation(config);
+
         //Rather than annotating each database table class entity as in the hibernate course
         sessionFactoryBean.setPackagesToScan(env.getProperty("giflib.entity.package"));
         sessionFactoryBean.setDataSource(dataSource());
