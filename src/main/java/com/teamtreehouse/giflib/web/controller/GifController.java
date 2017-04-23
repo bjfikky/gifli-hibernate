@@ -2,10 +2,14 @@ package com.teamtreehouse.giflib.web.controller;
 
 import com.teamtreehouse.giflib.model.Gif;
 import com.teamtreehouse.giflib.service.CategoryService;
+import com.teamtreehouse.giflib.service.GifService;
+import com.teamtreehouse.giflib.web.FlashMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +17,10 @@ import java.util.List;
 @Controller
 public class GifController {
     @Autowired
-    CategoryService categoryService;
+    private GifService gifService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     // Home page - index of all GIFs
     @RequestMapping("/")
@@ -30,7 +37,6 @@ public class GifController {
     public String gifDetails(@PathVariable Long gifId, Model model) {
         // TODO: Get gif whose id is gifId
         Gif gif = null;
-
         model.addAttribute("gif", gif);
         return "gif/details";
     }
@@ -56,11 +62,16 @@ public class GifController {
 
     // Upload a new GIF
     @RequestMapping(value = "/gifs", method = RequestMethod.POST)
-    public String addGif() {
+    public String addGif(Gif gif, @RequestParam MultipartFile file, RedirectAttributes redirectAttributes) {
         // TODO: Upload new GIF if data is valid
+        gifService.save(gif, file);
+
+        // Add flash message for successful upload
+        redirectAttributes.addFlashAttribute("flash", new FlashMessage("Gif successfully uploaded"
+                , FlashMessage.Status.SUCCESS));
 
         // TODO: Redirect browser to new GIF's detail view
-        return null;
+        return String.format("redirect: /gifs/%s", gif.getId());
     }
 
     // Form for uploading a new GIF
