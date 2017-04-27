@@ -60,6 +60,14 @@ public class CategoryController {
         }
 
         model.addAttribute("colors", Color.values());
+
+        // For making the form dynamic for new category and updating existing category
+        model.addAttribute("action", "/categories");
+        model.addAttribute("heading", "New Category");
+        model.addAttribute("submit", "Add");
+
+
+
         return "category/form";
     }
 
@@ -67,17 +75,41 @@ public class CategoryController {
     @RequestMapping("categories/{categoryId}/edit")
     public String formEditCategory(@PathVariable Long categoryId, Model model) {
         // TODO: Add model attributes needed for edit form
+        if(!model.containsAttribute("category")) {
+            model.addAttribute("category", categoryService.findById(categoryId));
+        }
 
-        return "category/form";
-    }
+        model.addAttribute("colors", Color.values());
+
+        // For making the form dynamic for new category and updating existing category
+        model.addAttribute("action", String.format("/categories/%s",categoryId));
+        model.addAttribute("heading", "Edit Category");
+        model.addAttribute("submit", "Update");
+
+        return "category/form";    }
 
     // Update an existing category
     @RequestMapping(value = "/categories/{categoryId}", method = RequestMethod.POST)
-    public String updateCategory() {
+    public String updateCategory(@Valid Category category, BindingResult result, RedirectAttributes redirectAttributes) {
         // TODO: Update category if valid data was received
+        if (result.hasErrors()) {
+            //Include validation errors upon redirect
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.category",result);
+
+            // Add category is invalid was received
+            redirectAttributes.addFlashAttribute("category", category);
+
+            // Redirect back to form
+            return String.format("redirect: categories/%s/edit",category.getId());
+        }
+
+        categoryService.save(category);
+
+        //If save was successful
+        redirectAttributes.addFlashAttribute("flash", new FlashMessage("Category was successfully updated!", FlashMessage.Status.SUCCESS));
 
         // TODO: Redirect browser to /categories
-        return null;
+        return "redirect:/categories";
     }
 
     // Add a category

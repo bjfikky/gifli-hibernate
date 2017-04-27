@@ -36,7 +36,7 @@ public class GifController {
     @RequestMapping("/gifs/{gifId}")
     public String gifDetails(@PathVariable Long gifId, Model model) {
         // TODO: Get gif whose id is gifId
-        Gif gif = null;
+        Gif gif = gifService.findById(gifId);
         model.addAttribute("gif", gif);
         return "gif/details";
     }
@@ -46,7 +46,7 @@ public class GifController {
     @ResponseBody
     public byte[] gifImage(@PathVariable Long gifId) {
         // TODO: Return image data as byte array of the GIF whose id is gifId
-        return null;
+        return gifService.findById(gifId).getBytes();
     }
 
     // Favorites - index of all GIFs marked favorite

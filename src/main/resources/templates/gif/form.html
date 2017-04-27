@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="divider"></div>
-    <form enctype="multipart/form-data" action="@{/gifs}" method="post" th:object="${gif}">
+    <form enctype="multipart/form-data" th:action="@{/gifs}" method="post" th:object="${gif}">
         <div class="row">
             <div class="col s12 l8">
                 <div class="file-wrapper">
