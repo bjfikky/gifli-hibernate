@@ -26,7 +26,7 @@ public class GifController {
     @RequestMapping("/")
     public String listGifs(Model model) {
         // TODO: Get all gifs
-        List<Gif> gifs = new ArrayList<>();
+        List<Gif> gifs = gifService.findAll();
 
         model.addAttribute("gifs", gifs);
         return "gif/index";
@@ -81,13 +81,27 @@ public class GifController {
         model.addAttribute("gif", new Gif());
         model.addAttribute("categories", categoryService.findAll());
 
+        model.addAttribute("action", "/gifs");
+        model.addAttribute("heading", "Upload");
+        model.addAttribute("submit", "Add");
+
+
+
         return "gif/form";
     }
 
     // Form for editing an existing GIF
-    @RequestMapping(value = "/gifs/{dgifI}/edit")
+    @RequestMapping(value = "/gifs/{gifId}/edit")
     public String formEditGif(@PathVariable Long gifId, Model model) {
         // TODO: Add model attributes needed for edit form
+        if (!model.containsAttribute("gifs")) {
+            model.addAttribute("gif", new Gif());
+        }
+        model.addAttribute("categories", categoryService.findAll());
+
+        model.addAttribute("action", String.format("/gifs/%s",gifId));
+        model.addAttribute("heading", "Edit GIF");
+        model.addAttribute("submit", "Update");
 
         return "gif/form";
     }
